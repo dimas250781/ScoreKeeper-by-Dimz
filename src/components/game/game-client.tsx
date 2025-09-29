@@ -6,11 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import type { Player } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { Menu, RefreshCw, Flag, Undo, Redo, Eraser, Delete, Check, Minus, PlusCircle, Pencil, MinusCircle } from 'lucide-react';
+import { Menu, RefreshCw, Flag, Undo, Redo, Eraser, Delete, Check, Minus, PlusCircle, Pencil, MinusCircle, History as HistoryIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { EditPlayersDialog } from './edit-players-dialog';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
+import Link from 'next/link';
 
 type ScoresGrid = (number | null)[][];
 
@@ -29,6 +30,14 @@ export function GameClient() {
   const [isEditPlayersOpen, setIsEditPlayersOpen] = useState(false);
   const [rowsToAdd, setRowsToAdd] = useState(1);
   const [rowsToRemove, setRowsToRemove] = useState(1);
+
+  const updateScores = useCallback((newScores: ScoresGrid) => {
+    const newHistory = history.slice(0, historyIndex + 1);
+    newHistory.push(newScores);
+    setHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
+    setScores(newScores);
+  }, [history, historyIndex]);
 
   useEffect(() => {
     document.body.classList.add('game-theme');
@@ -64,13 +73,6 @@ export function GameClient() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, router]);
 
-  const updateScores = useCallback((newScores: ScoresGrid) => {
-    const newHistory = history.slice(0, historyIndex + 1);
-    newHistory.push(newScores);
-    setHistory(newHistory);
-    setHistoryIndex(newHistory.length - 1);
-    setScores(newScores);
-  }, [history, historyIndex]);
 
   const handleConfirm = useCallback(() => {
     if (activeCell) {
@@ -253,6 +255,11 @@ export function GameClient() {
                       <Button variant="outline" onClick={() => setIsEditPlayersOpen(true)}>
                         <Pencil className="mr-2"/>Edit Players
                       </Button>
+                      <Button variant="outline" asChild>
+                        <Link href="/history">
+                            <HistoryIcon className="mr-2"/>Game History
+                        </Link>
+                      </Button>
                       <div className="space-y-2">
                         <Label htmlFor="add-rows">Add Score Rows</Label>
                         <div className="flex gap-2">
@@ -260,7 +267,7 @@ export function GameClient() {
                                 id="add-rows" 
                                 type="number" 
                                 value={rowsToAdd} 
-                                onChange={(e) => setRowsToAdd(e.target.value ? parseInt(e.target.value, 10) : 0)}
+                                onChange={(e) => setRowsToAdd(e.target.value ? parseInt(e.target.value, 10) : 1)}
                                 min="1"
                                 className="w-20"
                             />
@@ -276,7 +283,7 @@ export function GameClient() {
                             id="remove-rows"
                             type="number"
                             value={rowsToRemove}
-                            onChange={(e) => setRowsToRemove(e.target.value ? parseInt(e.target.value, 10) : 0)}
+                            onChange={(e) => setRowsToRemove(e.target.value ? parseInt(e.target.value, 10) : 1)}
                             min="1"
                             className="w-20"
                           />
