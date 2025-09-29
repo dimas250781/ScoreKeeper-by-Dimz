@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { History, HelpCircle, PlusCircle } from 'lucide-react';
+import { History, HelpCircle, PlusCircle, Settings } from 'lucide-react';
 import { Logo } from '@/components/common/logo';
 
 export default function Home() {
@@ -25,6 +25,12 @@ export default function Home() {
               <Link href="/history">
                 <History />
                 Game History
+              </Link>
+            </Button>
+             <Button asChild variant="secondary" className="w-full">
+              <Link href="/settings">
+                <Settings />
+                Settings
               </Link>
             </Button>
             <Button asChild variant="outline" className="w-full">

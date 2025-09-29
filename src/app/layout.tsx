@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
+import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
   title: 'RemiScore',
@@ -24,7 +25,9 @@ export default function RootLayout({
         />
       </head>
       <body className={cn('min-h-screen bg-background font-body antialiased')}>
-        {children}
+        <ThemeProvider>
+            {children}
+        </ThemeProvider>
         <Toaster />
       </body>
     </html>
