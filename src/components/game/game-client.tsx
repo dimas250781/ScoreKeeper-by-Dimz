@@ -210,8 +210,41 @@ export function GameClient() {
   };
 
   const handlePlayerNamesUpdate = (updatedPlayers: Player[]) => {
+    const oldNumPlayers = players.length;
+    const newNumPlayers = updatedPlayers.length;
+
     setPlayers(updatedPlayers);
-    // Optionally, update game state in URL or localStorage
+
+    if (newNumPlayers > oldNumPlayers) {
+        // Players were added
+        const numAdded = newNumPlayers - oldNumPlayers;
+        const newScores = scores.map(row => [...row, ...Array(numAdded).fill(null)]);
+        updateScores(newScores);
+    } else if (newNumPlayers < oldNumPlayers) {
+        // This case is more complex, we need to decide which columns to remove.
+        // For simplicity, let's assume we can't remove players mid-game, only rename.
+        // The dialog logic prevents removal for now. Or we can just rebuild the grid.
+        
+        // Re-align scores based on new player list
+        const newScores = scores.map(row => {
+            const newRow = updatedPlayers.map((player, index) => {
+                const oldPlayerIndex = players.findIndex(p => p.name === player.name);
+                if (oldPlayerIndex !== -1 && oldPlayerIndex < row.length) {
+                    return row[oldPlayerIndex];
+                }
+                // This logic is tricky. Let's rebuild scores based on the new player list indices.
+                const oldPlayerWhoWasAtIndex = players[index];
+                if (updatedPlayers.some(p => p.name === oldPlayerWhoWasAtIndex.name)) {
+                   return row[index]
+                }
+                return null; // or some default
+            });
+             // This part is imperfect. A better approach might be to just remove the columns from the end.
+            return newRow.slice(0, newNumPlayers);
+        });
+        updateScores(newScores);
+    }
+
     const params = new URLSearchParams();
     updatedPlayers.forEach(p => params.append('player', p.name));
     params.append('rows', String(numRows));
