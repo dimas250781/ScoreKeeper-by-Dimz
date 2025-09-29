@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import type { Player } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { Menu, RefreshCw, Flag, Undo, Redo, Eraser, Delete, Check, Minus, PlusCircle, Pencil } from 'lucide-react';
+import { Menu, RefreshCw, Flag, Undo, Redo, Eraser, Delete, Check, Minus, PlusCircle, Pencil, MinusCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { EditPlayersDialog } from './edit-players-dialog';
 import { Input } from '../ui/input';
@@ -28,6 +28,7 @@ export function GameClient() {
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [isEditPlayersOpen, setIsEditPlayersOpen] = useState(false);
   const [rowsToAdd, setRowsToAdd] = useState(5);
+  const [rowsToRemove, setRowsToRemove] = useState(1);
 
   useEffect(() => {
     document.body.classList.add('game-theme');
@@ -67,20 +68,6 @@ export function GameClient() {
     setHistoryIndex(newHistory.length - 1);
     setScores(newScores);
   }, [history, historyIndex]);
-  
-  const handleNumpadClick = (value: string) => {
-    if (value === '-') {
-        if (inputValue === '') {
-            setInputValue('-');
-        } else if (inputValue.startsWith('-')) {
-            setInputValue(inputValue.substring(1));
-        } else {
-            setInputValue('-' + inputValue);
-        }
-        return;
-    }
-    setInputValue(prev => prev + value);
-  };
 
   const handleConfirm = useCallback(() => {
     if (activeCell) {
@@ -95,6 +82,20 @@ export function GameClient() {
       setInputValue('');
     }
   }, [activeCell, inputValue, scores, updateScores]);
+  
+  const handleNumpadClick = (value: string) => {
+    if (value === '-') {
+        if (inputValue === '') {
+            setInputValue('-');
+        } else if (inputValue.startsWith('-')) {
+            setInputValue(inputValue.substring(1));
+        } else {
+            setInputValue('-' + inputValue);
+        }
+        return;
+    }
+    setInputValue(prev => prev + value);
+  };
 
 
   const handleBackspace = () => {
@@ -185,6 +186,24 @@ export function GameClient() {
     }
   }
 
+  const handleRemoveRows = () => {
+    if (rowsToRemove > 0 && scores.length > rowsToRemove) {
+      setNumRows(prev => prev - rowsToRemove);
+      const newScores = scores.slice(0, scores.length - rowsToRemove);
+      updateScores(newScores);
+      toast({
+        title: 'Rows Removed',
+        description: `${rowsToRemove} rows have been removed from the bottom.`,
+      });
+    } else {
+       toast({
+        title: 'Invalid Action',
+        description: 'Cannot remove that many rows.',
+        variant: 'destructive'
+      });
+    }
+  };
+
   const handlePlayerNamesUpdate = (updatedPlayers: Player[]) => {
     setPlayers(updatedPlayers);
     // Optionally, update game state in URL or localStorage
@@ -245,6 +264,23 @@ export function GameClient() {
                             <Button variant="outline" onClick={handleAddRows}>
                                 <PlusCircle className="mr-2"/>Add
                             </Button>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="remove-rows">Remove Score Rows</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            id="remove-rows"
+                            type="number"
+                            value={rowsToRemove}
+                            onChange={(e) => setRowsToRemove(parseInt(e.target.value, 10))}
+                            min="1"
+                            className="w-20"
+                          />
+                          <Button variant="outline" onClick={handleRemoveRows}>
+                            <MinusCircle className="mr-2" />
+                            Remove
+                          </Button>
                         </div>
                       </div>
                       <hr/>
