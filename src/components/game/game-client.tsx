@@ -73,7 +73,6 @@ export function GameClient() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, router]);
 
-
   const handleConfirm = useCallback(() => {
     if (activeCell) {
       const { row, col } = activeCell;
@@ -300,7 +299,7 @@ export function GameClient() {
                                 id="add-rows" 
                                 type="number" 
                                 value={rowsToAdd} 
-                                onChange={(e) => setRowsToAdd(e.target.value ? parseInt(e.target.value, 10) : 1)}
+                                onChange={(e) => setRowsToAdd(parseInt(e.target.value) || 1)}
                                 min="1"
                                 className="w-20"
                             />
@@ -316,7 +315,7 @@ export function GameClient() {
                             id="remove-rows"
                             type="number"
                             value={rowsToRemove}
-                            onChange={(e) => setRowsToRemove(e.target.value ? parseInt(e.target.value, 10) : 1)}
+                            onChange={(e) => setRowsToRemove(parseInt(e.target.value) || 1)}
                             min="1"
                             className="w-20"
                           />
@@ -340,7 +339,7 @@ export function GameClient() {
         </header>
 
         <main className="flex-grow overflow-auto">
-          <div className={cn('grid gap-2 text-center', gridColsClass)}>
+          <div className={cn('grid gap-2 text-center sticky top-0 bg-background py-2', gridColsClass)}>
             {players.map(player => (
               <div key={player.name} className="font-bold text-lg truncate">{player.name}</div>
             ))}
@@ -361,7 +360,7 @@ export function GameClient() {
           </div>
         </main>
 
-        <footer className="pt-2">
+        <footer className={cn('pt-2 sticky bottom-0 bg-background', { 'pb-[220px]': activeCell })}>
           <div className={cn('grid gap-2 text-center border-t-2 border-border pt-2', gridColsClass)}>
               {totals.map((total, i) => (
                   <div key={i} className="font-bold text-xl p-2 bg-muted/20 rounded-md">{total}</div>
