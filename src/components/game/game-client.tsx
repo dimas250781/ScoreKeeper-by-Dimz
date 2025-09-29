@@ -7,6 +7,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import type { Player } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Menu, ArrowLeft, RefreshCw, Eraser, Check, Undo, Redo, Flag } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 type ScoresGrid = (number | null)[][];
 
@@ -63,12 +64,14 @@ export function GameClient() {
   }, [history, historyIndex]);
 
   useEffect(() => {
-    const updatedPlayers = players.map((player, colIndex) => {
-      const newScores = scores.map(row => row[colIndex] ?? 0);
-      const total = newScores.reduce((acc, score) => acc + score, 0);
-      return { ...player, scores: newScores, total };
-    });
-    setPlayers(updatedPlayers);
+    if (scores.length > 0) {
+        const updatedPlayers = players.map((player, colIndex) => {
+          const newScores = scores.map(row => row[colIndex] ?? 0);
+          const total = newScores.reduce((acc, score) => acc + score, 0);
+          return { ...player, scores: newScores, total };
+        });
+        setPlayers(updatedPlayers);
+    }
   }, [scores]);
 
 
@@ -132,6 +135,7 @@ export function GameClient() {
   }
   
   const numpadKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+  const gridColsClass = `grid-cols-${players.length}`;
 
   return (
     <div className="flex flex-col h-screen bg-background text-foreground font-sans p-2 sm:p-4">
@@ -161,14 +165,14 @@ export function GameClient() {
       </header>
 
       <main className="flex-grow overflow-auto">
-        <div className="grid grid-cols-4 gap-2 text-center">
+        <div className={cn('grid gap-2 text-center', gridColsClass)}>
           {players.map(player => (
             <div key={player.name} className="font-bold text-lg truncate">{player.name}</div>
           ))}
         </div>
-        <div className="grid grid-cols-4 gap-2 text-center mt-2">
+        <div className={cn('grid gap-2 text-center mt-2', gridColsClass)}>
             {Array(numRows).fill(0).map((_, rowIndex) => (
-                players.map((player, colIndex) => (
+                players.map((_, colIndex) => (
                     <div
                         key={`${rowIndex}-${colIndex}`}
                         className={`p-2 border border-border rounded-md cursor-pointer h-12 flex items-center justify-center text-xl
@@ -183,7 +187,7 @@ export function GameClient() {
       </main>
 
       <footer className="pt-2">
-        <div className="grid grid-cols-4 gap-2 text-center border-t-2 border-border pt-2">
+        <div className={cn('grid gap-2 text-center border-t-2 border-border pt-2', gridColsClass)}>
             {totals.map((total, i) => (
                 <div key={i} className="font-bold text-xl p-2 bg-muted/20 rounded-md">{total}</div>
             ))}

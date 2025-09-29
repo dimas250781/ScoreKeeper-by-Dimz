@@ -13,17 +13,17 @@ interface AddPlayersFormProps {
 }
 
 export function AddPlayersForm({ numRows }: AddPlayersFormProps) {
-  const [players, setPlayers] = useState<string[]>(['Han', 'Chewie', 'Luke', 'Leia']);
+  const [players, setPlayers] = useState<string[]>(['Player 1', 'Player 2']);
   const router = useRouter();
   const { toast } = useToast();
 
   const handleAddPlayer = () => {
-    if (players.length < 4) {
-      setPlayers([...players, '']);
+    if (players.length < 6) {
+      setPlayers([...players, `Player ${players.length + 1}`]);
     } else {
       toast({
         title: 'Maximum players reached',
-        description: 'You can add a maximum of 4 players for this mode.',
+        description: 'You can add a maximum of 6 players.',
         variant: 'destructive',
       });
     }
@@ -113,7 +113,7 @@ export function AddPlayersForm({ numRows }: AddPlayersFormProps) {
           type="button"
           variant="outline"
           onClick={handleAddPlayer}
-          disabled={players.length >= 4}
+          disabled={players.length >= 6}
           className="w-full"
         >
           <PlusCircle />
