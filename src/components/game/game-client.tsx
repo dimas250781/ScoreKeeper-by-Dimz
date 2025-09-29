@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import type { Player } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { Menu, ArrowLeft, RefreshCw, Eraser, Check, Undo, Redo, Flag, Delete } from 'lucide-react';
+import { Menu, RefreshCw, Flag, Undo, Redo, Eraser, Delete, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type ScoresGrid = (number | null)[][];
@@ -59,6 +59,14 @@ export function GameClient() {
     setInputValue(prev => prev + value);
   };
 
+  const updateScores = useCallback((newScores: ScoresGrid) => {
+    const newHistory = history.slice(0, historyIndex + 1);
+    newHistory.push(newScores);
+    setHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
+    setScores(newScores);
+  }, [history, historyIndex]);
+
   const handleConfirm = useCallback(() => {
     if (activeCell) {
       const { row, col } = activeCell;
@@ -102,14 +110,6 @@ export function GameClient() {
     };
   }, [activeCell, handleConfirm]);
 
-  const updateScores = useCallback((newScores: ScoresGrid) => {
-    const newHistory = history.slice(0, historyIndex + 1);
-    newHistory.push(newScores);
-    setHistory(newHistory);
-    setHistoryIndex(newHistory.length - 1);
-    setScores(newScores);
-  }, [history, historyIndex]);
-
   useEffect(() => {
     if (scores.length > 0) {
         const updatedPlayers = players.map((player, colIndex) => {
@@ -119,7 +119,7 @@ export function GameClient() {
         });
         setPlayers(updatedPlayers);
     }
-  }, [scores]);
+  }, [scores, players.length]);
 
 
   const handleCellClick = (row: number, col: number) => {
