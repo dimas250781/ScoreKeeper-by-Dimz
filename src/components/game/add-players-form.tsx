@@ -8,11 +8,9 @@ import { Label } from '@/components/ui/label';
 import { PlusCircle, MinusCircle, User, Play } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-interface AddPlayersFormProps {
-    numRows: number;
-}
+const INITIAL_ROWS = 10;
 
-export function AddPlayersForm({ numRows }: AddPlayersFormProps) {
+export function AddPlayersForm() {
   const [players, setPlayers] = useState<string[]>(['Player 1', 'Player 2']);
   const router = useRouter();
   const { toast } = useToast();
@@ -72,7 +70,7 @@ export function AddPlayersForm({ numRows }: AddPlayersFormProps) {
 
     const params = new URLSearchParams();
     validPlayers.forEach(player => params.append('player', player));
-    params.append('rows', String(numRows));
+    params.append('rows', String(INITIAL_ROWS));
     router.push(`/game?${params.toString()}`);
   };
 
