@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import type { Player } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { Menu, ArrowLeft, RefreshCw, Eraser, Check, Undo, Redo, Flag } from 'lucide-react';
+import { Menu, ArrowLeft, RefreshCw, Eraser, Check, Undo, Redo, Flag, Delete } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type ScoresGrid = (number | null)[][];
@@ -54,6 +54,53 @@ export function GameClient() {
         document.body.classList.remove('game-theme');
     }
   }, [searchParams, router, numRows]);
+  
+  const handleNumpadClick = (value: string) => {
+    setInputValue(prev => prev + value);
+  };
+
+  const handleConfirm = useCallback(() => {
+    if (activeCell) {
+      const { row, col } = activeCell;
+      const newScores = scores.map(r => [...r]);
+      const scoreValue = inputValue === '' ? null : parseInt(inputValue, 10);
+      if (!isNaN(scoreValue as any)) {
+        newScores[row][col] = scoreValue;
+        updateScores(newScores);
+      }
+      setActiveCell(null);
+      setInputValue('');
+    }
+  }, [activeCell, inputValue, scores, updateScores]);
+
+
+  const handleBackspace = () => {
+    setInputValue(prev => prev.slice(0, -1));
+  }
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+        if (!activeCell) return;
+
+        if (event.key >= '0' && event.key <= '9') {
+            handleNumpadClick(event.key);
+        } else if (event.key === 'Enter') {
+            event.preventDefault();
+            handleConfirm();
+        } else if (event.key === 'Backspace') {
+            handleBackspace();
+        } else if (event.key === 'Escape') {
+            setActiveCell(null);
+            setInputValue('');
+        }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [activeCell, handleConfirm]);
 
   const updateScores = useCallback((newScores: ScoresGrid) => {
     const newHistory = history.slice(0, historyIndex + 1);
@@ -81,26 +128,8 @@ export function GameClient() {
     setInputValue(currentValue !== null ? String(currentValue) : '');
   };
 
-  const handleNumpadClick = (value: string) => {
-    setInputValue(prev => prev + value);
-  };
-
   const handleClear = () => {
     setInputValue('');
-  };
-
-  const handleConfirm = () => {
-    if (activeCell) {
-      const { row, col } = activeCell;
-      const newScores = scores.map(r => [...r]);
-      const scoreValue = inputValue === '' ? null : parseInt(inputValue, 10);
-      if (!isNaN(scoreValue as any)) {
-        newScores[row][col] = scoreValue;
-        updateScores(newScores);
-      }
-      setActiveCell(null);
-      setInputValue('');
-    }
   };
 
   const handleUndo = () => {
@@ -134,7 +163,7 @@ export function GameClient() {
     return <div className="bg-green-900 text-white flex justify-center items-center h-screen">Loading...</div>;
   }
   
-  const numpadKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+  const numpadKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
   const gridColsClass = `grid-cols-${players.length}`;
 
   return (
@@ -194,14 +223,18 @@ export function GameClient() {
         </div>
         
         {activeCell && (
-          <div className="mt-2 p-2 rounded-lg bg-card/80">
-            <div className="p-2 text-right text-2xl font-mono h-12 border-b-2 mb-2">{inputValue || 0}</div>
-            <div className="grid grid-cols-5 gap-1">
-              {numpadKeys.map(key => (
-                <Button key={key} onClick={() => handleNumpadClick(key)} variant="secondary" className="h-12 text-xl">{key}</Button>
-              ))}
-              <Button onClick={handleClear} variant="destructive" className="h-12 text-xl"><Eraser /></Button>
-              <Button onClick={handleConfirm} variant="default" className="h-12 text-xl col-span-4"><Check /> Confirm</Button>
+          <div className="fixed bottom-0 left-0 right-0 p-2 bg-card/95 backdrop-blur-sm border-t">
+            <div className="max-w-md mx-auto">
+              <div className="p-2 text-right text-3xl font-mono h-14 border-b-2 mb-2 flex items-center justify-end">{inputValue || 0}</div>
+              <div className="grid grid-cols-4 gap-2">
+                {numpadKeys.map(key => (
+                  <Button key={key} onClick={() => handleNumpadClick(key)} variant="secondary" className="h-12 text-xl">{key}</Button>
+                ))}
+                <Button onClick={handleClear} variant="secondary" className="h-12 text-xl"><Eraser size={24}/></Button>
+                <Button onClick={() => handleNumpadClick('0')} variant="secondary" className="h-12 text-xl">0</Button>
+                <Button onClick={handleBackspace} variant="secondary" className="h-12 text-xl"><Delete size={24}/></Button>
+                <Button onClick={handleConfirm} variant="default" className="h-12 text-xl col-span-4"><Check /> Confirm</Button>
+              </div>
             </div>
           </div>
         )}
