@@ -27,7 +27,7 @@ export function GameClient() {
   const [history, setHistory] = useState<ScoresGrid[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [isEditPlayersOpen, setIsEditPlayersOpen] = useState(false);
-  const [rowsToAdd, setRowsToAdd] = useState(5);
+  const [rowsToAdd, setRowsToAdd] = useState(1);
   const [rowsToRemove, setRowsToRemove] = useState(1);
 
   useEffect(() => {
@@ -45,8 +45,10 @@ export function GameClient() {
     }
 
     if (playerNames.length > 0) {
+      const initialNumRows = rows ? parseInt(rows, 10) : (localStorage.getItem('remi-game-rows') ? parseInt(localStorage.getItem('remi-game-rows')!, 10) : 10);
+      setNumRows(initialNumRows);
       setPlayers(playerNames.map(name => ({ name, scores: [], total: 0 })));
-      const initialScores: ScoresGrid = Array(numRows)
+      const initialScores: ScoresGrid = Array(initialNumRows)
         .fill(0)
         .map(() => Array(playerNames.length).fill(null));
       setScores(initialScores);
@@ -59,7 +61,8 @@ export function GameClient() {
     return () => {
         document.body.classList.remove('game-theme');
     }
-  }, [searchParams, router, numRows]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, router]);
 
   const updateScores = useCallback((newScores: ScoresGrid) => {
     const newHistory = history.slice(0, historyIndex + 1);
@@ -257,7 +260,7 @@ export function GameClient() {
                                 id="add-rows" 
                                 type="number" 
                                 value={rowsToAdd} 
-                                onChange={(e) => setRowsToAdd(parseInt(e.target.value, 10))}
+                                onChange={(e) => setRowsToAdd(e.target.value ? parseInt(e.target.value, 10) : 0)}
                                 min="1"
                                 className="w-20"
                             />
@@ -273,7 +276,7 @@ export function GameClient() {
                             id="remove-rows"
                             type="number"
                             value={rowsToRemove}
-                            onChange={(e) => setRowsToRemove(parseInt(e.target.value, 10))}
+                            onChange={(e) => setRowsToRemove(e.target.value ? parseInt(e.target.value, 10) : 0)}
                             min="1"
                             className="w-20"
                           />
