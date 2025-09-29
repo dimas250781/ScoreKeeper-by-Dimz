@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import type { Player } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { Menu, RefreshCw, Flag, Undo, Redo, Eraser, Delete, Check } from 'lucide-react';
+import { Menu, RefreshCw, Flag, Undo, Redo, Eraser, Delete, Check, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type ScoresGrid = (number | null)[][];
@@ -56,6 +56,16 @@ export function GameClient() {
   }, [searchParams, router, numRows]);
   
   const handleNumpadClick = (value: string) => {
+    if (value === '-') {
+        if (inputValue === '') {
+            setInputValue('-');
+        } else if (inputValue.startsWith('-')) {
+            setInputValue(inputValue.substring(1));
+        } else {
+            setInputValue('-' + inputValue);
+        }
+        return;
+    }
     setInputValue(prev => prev + value);
   };
 
@@ -71,8 +81,8 @@ export function GameClient() {
     if (activeCell) {
       const { row, col } = activeCell;
       const newScores = scores.map(r => [...r]);
-      const scoreValue = inputValue === '' ? null : parseInt(inputValue, 10);
-      if (!isNaN(scoreValue as any)) {
+      const scoreValue = inputValue === '' || inputValue === '-' ? null : parseInt(inputValue, 10);
+      if (!isNaN(scoreValue as any) || scoreValue === null) {
         newScores[row][col] = scoreValue;
         updateScores(newScores);
       }
@@ -92,6 +102,8 @@ export function GameClient() {
 
         if (event.key >= '0' && event.key <= '9') {
             handleNumpadClick(event.key);
+        } else if (event.key === '-') {
+            handleNumpadClick('-');
         } else if (event.key === 'Enter') {
             event.preventDefault();
             handleConfirm();
@@ -111,7 +123,7 @@ export function GameClient() {
   }, [activeCell, handleConfirm]);
 
   useEffect(() => {
-    if (scores.length > 0) {
+    if (scores.length > 0 && players.length > 0) {
         const updatedPlayers = players.map((player, colIndex) => {
           const newScores = scores.map(row => row[colIndex] ?? 0);
           const total = newScores.reduce((acc, score) => acc + score, 0);
@@ -119,7 +131,8 @@ export function GameClient() {
         });
         setPlayers(updatedPlayers);
     }
-  }, [scores, players.length]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scores]);
 
 
   const handleCellClick = (row: number, col: number) => {
@@ -230,10 +243,11 @@ export function GameClient() {
                 {numpadKeys.map(key => (
                   <Button key={key} onClick={() => handleNumpadClick(key)} variant="secondary" className="h-12 text-xl">{key}</Button>
                 ))}
-                <Button onClick={handleClear} variant="secondary" className="h-12 text-xl"><Eraser size={24}/></Button>
+                <Button onClick={() => handleNumpadClick('-')} variant="secondary" className="h-12 text-xl"><Minus size={24}/></Button>
                 <Button onClick={() => handleNumpadClick('0')} variant="secondary" className="h-12 text-xl">0</Button>
-                <Button onClick={handleBackspace} variant="secondary" className="h-12 text-xl"><Delete size={24}/></Button>
-                <Button onClick={handleConfirm} variant="default" className="h-12 text-xl col-span-4"><Check /> Confirm</Button>
+                <Button onClick={handleClear} variant="secondary" className="h-12 text-xl"><Eraser size={24}/></Button>
+                <Button onClick={handleBackspace} variant="secondary" className="h-12 text-xl col-span-2"><Delete size={24}/></Button>
+                <Button onClick={handleConfirm} variant="default" className="h-12 text-xl col-span-2"><Check /> Confirm</Button>
               </div>
             </div>
           </div>
