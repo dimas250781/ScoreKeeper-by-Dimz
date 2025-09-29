@@ -1,43 +1,41 @@
 import { Suspense } from 'react';
 import { GameClient } from '@/components/game/game-client';
-import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
 function GameLoading() {
   return (
-    <main className="p-4 md:p-6">
-      <Card>
-        <CardContent className="p-4 space-y-4">
-          <div className="flex justify-between items-center">
-            <Skeleton className="h-8 w-32" />
-            <Skeleton className="h-10 w-24" />
-          </div>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <Skeleton className="h-6 w-20" />
-              <Skeleton className="h-6 w-12" />
+    <div className="flex flex-col items-center justify-center min-h-screen bg-green-900 text-white p-4">
+      <Skeleton className="h-8 w-48 mb-4" />
+      <div className="w-full max-w-md space-y-2">
+        <div className="grid grid-cols-4 gap-4">
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
+        </div>
+        {[...Array(5)].map((_, i) => (
+            <div key={i} className="grid grid-cols-4 gap-4">
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
             </div>
-            <div className="flex justify-between">
-              <Skeleton className="h-6 w-24" />
-              <Skeleton className="h-6 w-12" />
-            </div>
-          </div>
-          <div className="flex gap-4">
-             <Skeleton className="h-10 flex-1" />
-             <Skeleton className="h-10 flex-1" />
-          </div>
-        </CardContent>
-      </Card>
-    </main>
+        ))}
+         <div className="grid grid-cols-4 gap-4 pt-2 border-t-2 border-gray-400">
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-8 w-full" />
+        </div>
+      </div>
+    </div>
   )
 }
 
 export default function GamePage() {
   return (
-    <div className="min-h-screen container mx-auto max-w-4xl py-4 md:py-8">
-      <Suspense fallback={<GameLoading />}>
-        <GameClient />
-      </Suspense>
-    </div>
+    <Suspense fallback={<GameLoading />}>
+      <GameClient />
+    </Suspense>
   );
 }

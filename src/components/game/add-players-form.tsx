@@ -8,18 +8,22 @@ import { Label } from '@/components/ui/label';
 import { PlusCircle, MinusCircle, User, Play } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-export function AddPlayersForm() {
-  const [players, setPlayers] = useState<string[]>(['', '']);
+interface AddPlayersFormProps {
+    numRows: number;
+}
+
+export function AddPlayersForm({ numRows }: AddPlayersFormProps) {
+  const [players, setPlayers] = useState<string[]>(['Han', 'Chewie', 'Luke', 'Leia']);
   const router = useRouter();
   const { toast } = useToast();
 
   const handleAddPlayer = () => {
-    if (players.length < 6) {
+    if (players.length < 4) {
       setPlayers([...players, '']);
     } else {
       toast({
         title: 'Maximum players reached',
-        description: 'You can add a maximum of 6 players.',
+        description: 'You can add a maximum of 4 players for this mode.',
         variant: 'destructive',
       });
     }
@@ -68,6 +72,7 @@ export function AddPlayersForm() {
 
     const params = new URLSearchParams();
     validPlayers.forEach(player => params.append('player', player));
+    params.append('rows', String(numRows));
     router.push(`/game?${params.toString()}`);
   };
 
@@ -108,7 +113,7 @@ export function AddPlayersForm() {
           type="button"
           variant="outline"
           onClick={handleAddPlayer}
-          disabled={players.length >= 6}
+          disabled={players.length >= 4}
           className="w-full"
         >
           <PlusCircle />

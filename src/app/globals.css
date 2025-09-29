@@ -47,6 +47,17 @@
     --input: 220 10% 25%;
     --ring: 215 33% 60%;
   }
+
+  .game-theme {
+    --background: 120 60% 15%;
+    --foreground: 0 0% 100%;
+    --card: 120 60% 18%;
+    --card-foreground: 0 0% 100%;
+    --primary: 215 80% 65%;
+    --primary-foreground: 210 40% 98%;
+    --border: 120 60% 25%;
+    --input: 120 60% 25%;
+  }
 }
 
 @layer base {

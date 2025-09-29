@@ -5,8 +5,8 @@ import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'RemiScore',
-  description: 'A simple score tracker for the Remi card game.',
+  title: 'ScoreKeeper',
+  description: 'A simple score tracker.',
 };
 
 export default function RootLayout({
